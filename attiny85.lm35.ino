@@ -7,10 +7,10 @@
 #define RX 2
 #define TX 1
 
-bool state = false;
 bool alert = false;
-unsigned long interval = 2000;
-unsigned long previousMillis;
+
+bool ledState = false;
+unsigned long previousLedMillis = 0;
 
 unsigned long readInterval = 1000;
 unsigned long previousReadMillis;
@@ -56,19 +56,20 @@ float getVoltage(int pin){
   return ((analogRead(pin)/1024.0)*5000); // 5Volts VCC
 }
 
+void aliveIndicator()
+{
+   ledState = true;
+   digitalWrite(pin0, HIGH);
+   delay(30);
+   digitalWrite(pin0, LOW);
+   ledState = false;
+}
+
 void toggleLed()
 {
-   state = !state;
-
-   if (state){
-    digitalWrite(pin0, HIGH);
-    if (!alert){
-      delay(20);
-      state = !state;
-     }
-   }
-
-   if (!state) digitalWrite(pin0, LOW);
+   ledState = !ledState;
+   if (ledState) digitalWrite(pin0, HIGH);
+   if (!ledState) digitalWrite(pin0, LOW);
 }
 
 void readData(){
@@ -85,7 +86,6 @@ void readData(){
    }
 
    alert = avTemp < 20;
-   interval = alert ? 200 : 2000;
 
    MySerial.print("mVolts: ");
    MySerial.print(voltage);
@@ -101,9 +101,16 @@ void loop() {
 
    unsigned long currentMillis = millis();
 
-   if (currentMillis - previousMillis >= interval){
-    toggleLed();
-    previousMillis = millis();
+   // No temperature alert. Regular low comsuption alive blink
+   if (!alert and (currentMillis - previousLedMillis >= 2000)){
+      aliveIndicator();
+      previousLedMillis = millis();
+   }
+
+   // Alert blink
+   if (alert and (currentMillis - previousLedMillis >= 300)){
+      toggleLed();
+      previousLedMillis = millis();
    }
 
    if (currentMillis - previousReadMillis >= readInterval){

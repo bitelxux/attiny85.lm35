@@ -42,13 +42,7 @@ void setup() {
 }
 
 float initSequence(){
-  for (int i=0; i<3; i++) {
-     toggleLed();
-     delay(200);
-     toggleLed();
-     delay(200);
-  }
-  delay(2000);
+  delay(1000);
 }
 
 float getVoltage(int pin){
@@ -60,7 +54,7 @@ void aliveIndicator()
 {
    ledState = true;
    digitalWrite(pin0, HIGH);
-   delay(30);
+   delay(20);
    digitalWrite(pin0, LOW);
    ledState = false;
 }
@@ -102,7 +96,7 @@ void loop() {
    unsigned long currentMillis = millis();
 
    // No temperature alert. Regular low comsuption alive blink
-   if (!alert and (currentMillis - previousLedMillis >= 2000)){
+   if (!alert and (currentMillis - previousLedMillis >= 3000)){
       aliveIndicator();
       previousLedMillis = millis();
    }

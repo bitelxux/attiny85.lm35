@@ -1,6 +1,9 @@
+#!/usr/bin/python
+
 import serial
 
-port = '/dev/ttyUSB0'
-ard = serial.Serial(port, 9600)
+ser = serial.Serial('/dev/ttyUSB0', 9600)
+
 while True:
-    print ard.readline()[:-1]
+    linea = ser.readline()
+    print linea[:-1]

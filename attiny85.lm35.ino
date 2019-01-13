@@ -8,7 +8,8 @@
 #define TX 1
 
 bool state = false;
-unsigned long interval = 1000;
+bool alert = false;
+unsigned long interval = 2000;
 unsigned long previousMillis;
 
 unsigned long readInterval = 1000;
@@ -47,6 +48,7 @@ float initSequence(){
      toggleLed();
      delay(200);
   }
+  delay(2000);
 }
 
 float getVoltage(int pin){
@@ -57,7 +59,15 @@ float getVoltage(int pin){
 void toggleLed()
 {
    state = !state;
-   if (state) digitalWrite(pin0, HIGH);
+
+   if (state){
+    digitalWrite(pin0, HIGH);
+    if (!alert){
+      delay(20);
+      state = !state;
+     }
+   }
+
    if (!state) digitalWrite(pin0, LOW);
 }
 
@@ -74,13 +84,8 @@ void readData(){
     tempPrev = temp;
    }
 
-   if (avTemp >= 20){
-    interval = 1000;
-   }
-   else
-   {
-    interval = 300;
-   }
+   alert = avTemp < 20;
+   interval = alert ? 200 : 2000;
 
    MySerial.print("mVolts: ");
    MySerial.print(voltage);
